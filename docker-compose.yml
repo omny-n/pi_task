@@ -1,0 +1,41 @@
+version: '3.1'
+
+services:
+  grpc_app:
+    container_name: grpc-app
+    build:
+      dockerfile: Dockerfile.grpc
+      context: .
+    depends_on:
+      - mongo
+    environment:
+      - DB_HOST=mongodb://mongo:27017
+  grpc_gateway:
+    container_name: grpc-gateway
+    build:
+      dockerfile: Dockerfile.gateway
+      context: .
+    volumes:
+      - ./gateway:/app/src/gateway-server
+    depends_on:
+      - grpc_app
+    ports:
+      - 8080:8080
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo:/data/db
+    ports:
+      - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+
+volumes:
+  mongo:

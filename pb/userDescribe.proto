@@ -1,0 +1,96 @@
+syntax = "proto3";
+package main;
+
+option go_package = "./user";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// The user service definition with http transcoding
+service UserService {
+  rpc CreateUser(CreateUserReq) returns (CreateUserRes) {
+    // Define HTTP mapping.
+    option (google.api.http) = {
+      post: "/users"
+      body: "*"
+    };
+  }
+  rpc ReadUser(ReadUserReq) returns (ReadUserRes) {
+    option (google.api.http) = { 
+      get: "/users/{id}" 
+    };
+  }
+  rpc UpdateUser(UpdateUserReq) returns (UpdateUserRes) {
+    option (google.api.http) = {
+      put: "/users/{id}"
+      body: "user"
+    };
+  }
+  rpc DeleteUser(DeleteUserReq) returns (DeleteUserRes) {
+    option (google.api.http) = { 
+      delete: "/users/{id}" 
+    };
+  }
+  rpc ListUsers(google.protobuf.Empty) returns (ListUsersRes) {
+    option (google.api.http) = {
+      get: "/user"
+    };
+  }
+}
+
+message User {
+  string id = 1;
+  string firstname = 2;
+  string lastname = 3;
+  int32 age = 4;
+  string email = 5;
+}
+
+
+// Defintion of request and respone for each services
+message CreateUserReq {
+  string firstname = 1;
+  string lastname = 2;
+  int32 age = 3;
+  string email = 4;
+}
+
+message CreateUserRes {
+  string id = 1;
+}
+
+message UpdateUserReqBody {
+  string firstname = 2;
+  string lastname = 3;
+  int32 age = 4;
+  string email = 5;
+}
+
+message UpdateUserReq {
+  string id = 1;
+  UpdateUserReqBody user = 2;
+}
+
+message UpdateUserRes {
+  User user = 1;
+}
+
+message ReadUserReq {
+  string id = 1;
+}
+
+message ReadUserRes {
+  User user = 1;
+}
+
+message DeleteUserReq {
+  string id = 1;
+}
+
+message DeleteUserRes {
+  bool success = 1;
+}
+
+message ListUsersRes {
+  repeated User users = 1;
+}

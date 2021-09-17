@@ -1,0 +1,25 @@
+FROM golang:1.17.1-alpine3.14 AS build
+
+RUN apk update && apk add --virtual build-dependencies build-base --no-cache curl ca-certificates git dep gcc
+
+ENV GOROOT=/usr/local/go \
+  GOPATH=/app
+
+WORKDIR /app/src
+
+COPY go.mod go.mod
+COPY go.sum go.sum
+
+RUN go mod download
+
+ADD . .
+
+RUN go build -o bin/gateway-server gateway-server/main.go
+
+FROM alpine:3
+
+WORKDIR /app
+
+COPY --from=build /app/src/bin/ /app/
+
+ENTRYPOINT ["/app/gateway-server"]

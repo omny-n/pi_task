@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+
+PROTOBUF_VERSION='3.17.1'
+OS='osx'
+ARCH='x86_64'
+GENERATE_PATH='./'
+BASENAME=protoc-$PROTOBUF_VERSION-$OS-$ARCH
+URL_TO_GOOGLEAPIS=https://github.com/googleapis/googleapis/archive/refs/heads/master.zip
+
+rm $BASENAME.zip
+
+URL=https://github.com/protocolbuffers/protobuf/releases/download/v$PROTOBUF_VERSION/$BASENAME.zip
+
+wget $URL
+wget $URL_TO_GOOGLEAPIS
+
+sudo unzip $BASENAME.zip -d /usr/local
+unzip master.zip
+sudo cp -r googleapis-master/google /usr/local/include
+rm $BASENAME.zip
+rm -r master.zip googleapis-master
+
+sudo chmod +x /usr/local/bin/protoc
+
+go get \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+go install \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
